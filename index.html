@@ -3,57 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galaxy Meet | Full Vision</title>
+    <title>Galaxy Meet | Private Edition</title>
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <style>
         :root { --bg: #05070a; --accent: #3d85f4; --vip-gold: #ffd700; --glass: rgba(255, 255, 255, 0.1); }
-        body { margin: 0; background: var(--bg); color: white; font-family: 'Inter', sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        body { margin: 0; background: var(--bg); color: white; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        header { padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.9); border-bottom: 1px solid var(--glass); z-index: 100; }
-        .logo { font-weight: bold; color: var(--accent); letter-spacing: 1px; }
+        header { padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; background: #000; border-bottom: 1px solid var(--glass); z-index: 100; }
+        .logo { font-weight: bold; color: var(--accent); }
 
         .main-layout { display: flex; flex: 1; position: relative; overflow: hidden; }
         
-        /* Исправленная сетка видео */
-        .viewport { flex: 3; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; align-items: center; }
-        .video-wrapper { 
-            position: relative; background: #000; border-radius: 16px; overflow: hidden; 
-            border: 3px solid var(--glass); transition: 0.4s; 
-            height: 90%; display: flex; align-items: center; justify-content: center;
-        }
-        /* Фикс для демки: объект теперь полностью виден */
-        video { width: 100%; height: 100%; object-fit: contain; background: #000; }
+        .viewport { flex: 3; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; background: #000; }
+        .video-wrapper { position: relative; background: #111; border-radius: 12px; overflow: hidden; border: 2px solid var(--glass); display: flex; align-items: center; justify-content: center; }
+        video { width: 100%; height: 100%; object-fit: contain; }
 
-        /* Панель управления */
         .side-panel { 
-            position: absolute; left: 20px; top: 80px; width: 300px; 
+            position: absolute; left: 20px; top: 80px; width: 280px; 
             background: #161b22; border-radius: 12px; border: 1px solid var(--glass); 
             z-index: 200; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            max-height: 80vh; overflow-y: auto;
         }
-        .panel-header { padding: 10px; background: #21262d; border-radius: 12px 12px 0 0; cursor: move; font-size: 11px; text-align: center; color: #8b949e; user-select: none; }
+        .panel-header { padding: 10px; background: #21262d; border-radius: 12px 12px 0 0; cursor: move; font-size: 11px; text-align: center; color: #8b949e; }
         .panel-content { padding: 15px; }
 
-        /* Стили инструкции */
-        #info-box { 
-            background: rgba(0,0,0,0.3); border-radius: 8px; padding: 10px; 
-            margin-top: 10px; font-size: 12px; line-height: 1.5; color: #ccc; 
-            display: none; border: 1px dashed #444;
-        }
-        .info-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 5px; width: 100%; border-radius: 5px; cursor: pointer; font-size: 11px; margin-top: 10px; }
+        .vip-locked { opacity: 0.3; pointer-events: none; filter: grayscale(1); transition: 0.3s; }
+        .vip-unlocked { opacity: 1 !important; pointer-events: all !important; filter: grayscale(0) !important; }
 
-        /* Чат */
-        .chat-panel { flex: 1; background: #0d1117; border-left: 1px solid var(--glass); display: flex; flex-direction: column; min-width: 320px; }
-        #chat-messages { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .chat-panel { flex: 1; background: #0d1117; border-left: 1px solid var(--glass); display: flex; flex-direction: column; min-width: 300px; }
+        #chat-messages { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
         .msg { background: var(--glass); padding: 8px 12px; border-radius: 12px; font-size: 14px; max-width: 85%; }
         .msg.me { align-self: flex-end; background: var(--accent); }
-        .msg b { font-size: 11px; display: block; margin-bottom: 2px; color: var(--vip-gold); }
 
-        input { width: 100%; padding: 10px; margin: 8px 0; background: #0d1117; border: 1px solid #30363d; color: white; border-radius: 8px; box-sizing: border-box; }
-        .btn-action { width: 100%; padding: 10px; background: var(--accent); border: none; color: white; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        input, .btn-action { width: 100%; padding: 10px; margin: 5px 0; border-radius: 8px; border: 1px solid #333; box-sizing: border-box; }
+        input { background: #0d1117; color: white; }
+        .btn-action { background: var(--accent); color: white; border: none; font-weight: bold; cursor: pointer; }
         
-        .controls { height: 85px; display: flex; justify-content: center; align-items: center; gap: 20px; background: #0d1117; border-top: 1px solid var(--glass); }
-        .circle-btn { width: 50px; height: 50px; border-radius: 50%; border: none; cursor: pointer; font-size: 20px; background: #30363d; color: white; transition: 0.2s; }
+        .controls { height: 80px; display: flex; justify-content: center; align-items: center; gap: 15px; background: #000; border-top: 1px solid var(--glass); }
+        .circle-btn { width: 45px; height: 45px; border-radius: 50%; border: none; cursor: pointer; background: #21262d; color: white; }
         .circle-btn.active { background: var(--accent); }
     </style>
 </head>
@@ -61,43 +47,33 @@
 
 <header>
     <div class="logo">GALAXY MEET</div>
-    <div style="display: flex; gap: 15px; align-items: center;">
-        <button onclick="exportAccount()" style="background:var(--glass); border:1px solid #444; color:#fff; font-size:10px; cursor:pointer; padding:6px 10px; border-radius:5px;">🔑 Ключ аккаунта</button>
-        <div onclick="copyId()" style="cursor:pointer; font-family: monospace; background: var(--glass); padding: 5px 10px; border-radius: 5px;">
-            ID: <span id="my-id-display" style="color:var(--accent)">...</span>
-        </div>
+    <div style="display: flex; gap: 10px;">
+        <button onclick="exportAccount()" style="background:none; border:1px solid #333; color:#666; font-size:10px; cursor:pointer;">🔑 КЛЮЧ</button>
+        <div onclick="copyId()" style="cursor:pointer; font-size: 12px; padding: 5px; background: var(--glass);">ID: <span id="my-id-display">...</span></div>
     </div>
 </header>
 
 <div class="main-layout">
     <div class="side-panel" id="draggablePanel">
-        <div class="panel-header" id="dragHandle">✥ ПАНЕЛЬ УПРАВЛЕНИЯ ✥</div>
+        <div class="panel-header" id="dragHandle">МЕНЮ (Кнопка 1 для сброса)</div>
         <div class="panel-content">
-            <div id="vip-badge" style="text-align:center; margin-bottom:10px;"></div>
-            
-            <small>Никнейм:</small>
-            <input type="text" id="nick-input" placeholder="Твой ник" oninput="saveAndSync()">
-            
-            <small>Цвет ауры:</small>
-            <input type="color" id="aura-color" value="#3d85f4" oninput="saveAndSync()">
-
-            <div id="activation-box">
-                <small>Активировать VIP:</small>
-                <input type="password" id="vip-key" placeholder="Код..." oninput="checkVipCode()">
+            <div id="activation-area">
+                <small>Введи код для доступа к VIP:</small>
+                <input type="password" id="vip-key" placeholder="Код активации..." oninput="checkVip()">
             </div>
 
+            <div id="vip-features" class="vip-locked">
+                <div id="vip-label" style="text-align:center; color:gold; font-size:12px; margin-bottom:5px;"></div>
+                <small>Никнейм:</small>
+                <input type="text" id="nick-input" placeholder="Ваш ник" oninput="saveData()">
+                <small>Цвет ауры:</small>
+                <input type="color" id="aura-color" style="height:35px" oninput="saveData()">
+            </div>
+
+            <hr style="border-color:#333; margin:10px 0;">
             <small>Вход по ключу:</small>
-            <input type="text" id="account-key-input" placeholder="Вставь ключ..." oninput="importAccount()">
-
-            <button class="info-btn" id="toggleInfo" onclick="toggleInstruction()">Показать инструкцию</button>
+            <input type="text" id="account-key-input" placeholder="Вставь ключ аккаунта..." oninput="importAccount()">
             
-            <div id="info-box">
-                <b>⌨️ Клавиша "1":</b> Если меню улетело за экран, нажми 1, чтобы вернуть его на место.<br><br>
-                <b>🔑 Ключ аккаунта:</b> Это твой паспорт. Скопируй его и сохрани. Вставь его в Америке или в другом браузере, чтобы вернуть свой ник и VIP без ввода кодов.<br><br>
-                <b>👑 VIP Статус:</b> Дает золотую корону в чате, уникальную подсветку видео (ауру) и вечное сохранение профиля в этом браузере.
-            </div>
-
-            <hr style="border:0; border-top:1px solid #333; margin: 15px 0;">
             <input type="text" id="target-id" placeholder="ID друга">
             <button class="btn-action" onclick="connectToPeer()">СОЕДИНИТЬСЯ</button>
         </div>
@@ -106,13 +82,13 @@
     <div class="viewport">
         <div class="video-wrapper" id="local-ui">
             <video id="localVideo" muted autoplay playsinline></video>
-            <div style="position:absolute; bottom:12px; left:12px; background:rgba(0,0,0,0.6); padding:4px 12px; border-radius:6px; font-size:12px;">
+            <div style="position:absolute; bottom:10px; left:10px; font-size:12px; background:rgba(0,0,0,0.5); padding:2px 8px; border-radius:4px;">
                 <span id="my-name-label">Вы</span>
             </div>
         </div>
         <div class="video-wrapper" id="remote-ui">
             <video id="remoteVideo" autoplay playsinline></video>
-            <div style="position:absolute; bottom:12px; left:12px; background:rgba(0,0,0,0.6); padding:4px 12px; border-radius:6px; font-size:12px;">
+            <div style="position:absolute; bottom:10px; left:10px; font-size:12px; background:rgba(0,0,0,0.5); padding:2px 8px; border-radius:4px;">
                 <span id="remote-name-label">Ожидание...</span>
             </div>
         </div>
@@ -120,9 +96,9 @@
 
     <div class="chat-panel">
         <div id="chat-messages"></div>
-        <div style="padding:15px; display:flex; gap:8px;">
+        <div style="padding:10px; display:flex; gap:5px;">
             <input type="text" id="chat-input" placeholder="Сообщение..." onkeypress="if(event.key==='Enter') sendChatMsg()">
-            <button class="btn-action" style="width:50px;" onclick="sendChatMsg()">></button>
+            <button class="btn-action" style="width:50px" onclick="sendChatMsg()">></button>
         </div>
     </div>
 </div>
@@ -141,94 +117,88 @@
     let myStream, screenStream, currentConn, currentCall;
     let myData = { nick: "Гость", isVip: false, color: "#3d85f4" };
 
-    // --- ИНСТРУКЦИЯ ---
-    function toggleInstruction() {
-        const box = document.getElementById('info-box');
-        const btn = document.getElementById('toggleInfo');
-        if(box.style.display === 'block') {
-            box.style.display = 'none';
-            btn.innerText = "Показать инструкцию";
-        } else {
-            box.style.display = 'block';
-            btn.innerText = "Скрыть инструкцию";
-        }
-    }
-
-    // --- ПАМЯТЬ И ПРОФИЛЬ ---
-    function loadSavedData() {
-        const saved = localStorage.getItem('galaxy_profile_v2');
-        if (saved) {
-            myData = JSON.parse(saved);
-            document.getElementById('nick-input').value = myData.nick;
-            document.getElementById('aura-color').value = myData.color;
-            updateUI();
-        }
-    }
-
-    function saveAndSync() {
-        myData.nick = document.getElementById('nick-input').value || "Гость";
-        myData.color = document.getElementById('aura-color').value;
-        localStorage.setItem('galaxy_profile_v2', JSON.stringify(myData));
-        updateUI();
-        if(currentConn && currentConn.open) currentConn.send({type: 'PROFILE', data: myData});
-    }
-
-    function checkVipCode() {
+    // 1. ПРОВЕРКА VIP
+    function checkVip() {
         if(document.getElementById('vip-key').value === "GALAXY_MEET_FOREVER_666777") {
             myData.isVip = true;
-            saveAndSync();
-            alert("VIP активирован!");
+            unlockVipUI();
+            saveData();
         }
     }
 
-    function updateUI() {
-        document.getElementById('my-name-label').innerText = (myData.isVip ? "👑 " : "") + myData.nick;
-        document.getElementById('local-ui').style.borderColor = myData.color;
+    function unlockVipUI() {
+        document.getElementById('vip-features').classList.add('vip-unlocked');
+        document.getElementById('activation-area').style.display = 'none';
+        document.getElementById('vip-label').innerText = "👑 GALAXY VIP АКТИВИРОВАН";
+    }
+
+    function saveData() {
         if(myData.isVip) {
-            document.getElementById('local-ui').style.boxShadow = `0 0 20px ${myData.color}66`;
-            document.getElementById('vip-badge').innerHTML = `<b style="color:gold; text-shadow:0 0 10px gold;">✦ GALAXY VIP ✦</b>`;
-            document.getElementById('activation-box').style.display = 'none';
+            myData.nick = document.getElementById('nick-input').value || "Гость";
+            myData.color = document.getElementById('aura-color').value;
+        }
+        localStorage.setItem('galaxy_final_save', JSON.stringify(myData));
+        updateInterface();
+        if(currentConn) currentConn.send({type: 'PROFILE', data: myData});
+    }
+
+    function updateInterface() {
+        document.getElementById('my-name-label').innerText = (myData.isVip ? "👑 " : "") + myData.nick;
+        document.getElementById('local-ui').style.borderColor = myData.isVip ? myData.color : "rgba(255,255,255,0.1)";
+        if(myData.isVip) document.getElementById('local-ui').style.boxShadow = `0 0 15px ${myData.color}55`;
+    }
+
+    // 2. ЗАГРУЗКА ПРИ СТАРТЕ
+    function init() {
+        const saved = localStorage.getItem('galaxy_final_save');
+        if(saved) {
+            myData = JSON.parse(saved);
+            if(myData.isVip) {
+                unlockVipUI();
+                document.getElementById('nick-input').value = myData.nick;
+                document.getElementById('aura-color').value = myData.color;
+                updateInterface();
+            }
         }
     }
 
+    // 3. ПЕРЕНОС АККАУНТА
     function exportAccount() {
-        const key = btoa(unescape(encodeURIComponent(JSON.stringify(myData))));
+        const key = btoa(JSON.stringify(myData));
         navigator.clipboard.writeText(key);
-        alert("Ключ аккаунта скопирован! Сохрани его для входа из-за границы.");
+        alert("Твой ключ скопирован! Вставь его на другом компе.");
     }
 
     function importAccount() {
-        const key = document.getElementById('account-key-input').value;
         try {
-            const decoded = JSON.parse(decodeURIComponent(escape(atob(key))));
-            if(decoded.nick) {
-                myData = decoded;
-                localStorage.setItem('galaxy_profile_v2', JSON.stringify(myData));
-                location.reload();
-            }
-        } catch(e) { }
+            const key = document.getElementById('account-key-input').value;
+            const decoded = JSON.parse(atob(key));
+            myData = decoded;
+            localStorage.setItem('galaxy_final_save', JSON.stringify(myData));
+            location.reload();
+        } catch(e) {}
     }
 
-    // --- КЛАВИША 1 И ПЕРЕТАСКИВАНИЕ ---
+    // 4. ГОРЯЧАЯ КЛАВИША 1
     document.addEventListener('keydown', (e) => {
         if(e.key === '1' && e.target.tagName !== 'INPUT') {
             pnl.style.top = "80px"; pnl.style.left = "20px";
         }
     });
 
+    // 5. ДРАГ-ЭНД-ДРОП
     hndl.onmousedown = (e) => {
         let nx = e.clientX, ny = e.clientY;
         document.onmousemove = (ev) => {
             let x = nx - ev.clientX, y = ny - ev.clientY;
             nx = ev.clientX; ny = ev.clientY;
-            let t = pnl.offsetTop - y, l = pnl.offsetLeft - x;
-            if(t < 0) t = 0; if(l < 0) l = 0;
-            pnl.style.top = t + "px"; pnl.style.left = l + "px";
+            pnl.style.top = (pnl.offsetTop - y) + "px";
+            pnl.style.left = (pnl.offsetLeft - x) + "px";
         };
         document.onmouseup = () => document.onmousemove = null;
     };
 
-    // --- ВИДЕО И СВЯЗЬ ---
+    // 6. СВЯЗЬ И ВИДЕО
     navigator.mediaDevices.getUserMedia({video:true, audio:true}).then(s => {
         myStream = s;
         document.getElementById('localVideo').srcObject = s;
@@ -238,7 +208,6 @@
 
     function connectToPeer() {
         const id = document.getElementById('target-id').value;
-        if(!id) return;
         currentCall = peer.call(id, myStream);
         currentCall.on('stream', s => document.getElementById('remoteVideo').srcObject = s);
         currentConn = peer.connect(id);
@@ -263,8 +232,7 @@
         conn.on('data', p => {
             if(p.type === 'PROFILE') {
                 document.getElementById('remote-name-label').innerText = (p.data.isVip ? "👑 " : "") + p.data.nick;
-                document.getElementById('remote-ui').style.borderColor = p.data.color;
-                if(p.data.isVip) document.getElementById('remote-ui').style.boxShadow = `0 0 20px ${p.data.color}66`;
+                document.getElementById('remote-ui').style.borderColor = p.data.isVip ? p.data.color : "rgba(255,255,255,0.1)";
             }
             if(p.type === 'CHAT') renderMsg(p.nick, p.text, false);
         });
@@ -275,14 +243,12 @@
             screenStream = await navigator.mediaDevices.getDisplayMedia({video: true});
             replaceTrack(screenStream.getVideoTracks()[0]);
             document.getElementById('localVideo').srcObject = screenStream;
-            document.getElementById('screenBtn').classList.add('active');
             screenStream.getVideoTracks()[0].onended = () => handleScreenShare();
         } else {
             screenStream.getTracks().forEach(t => t.stop());
             screenStream = null;
             replaceTrack(myStream.getVideoTracks()[0]);
             document.getElementById('localVideo').srcObject = myStream;
-            document.getElementById('screenBtn').classList.remove('active');
         }
     }
 
@@ -296,7 +262,7 @@
     function sendChatMsg() {
         const txt = document.getElementById('chat-input').value;
         if(!txt) return;
-        if(currentConn && currentConn.open) currentConn.send({type: 'CHAT', text: txt, nick: myData.nick});
+        if(currentConn) currentConn.send({type: 'CHAT', text: txt, nick: myData.nick});
         renderMsg("Вы", txt, true);
         document.getElementById('chat-input').value = "";
     }
@@ -321,7 +287,7 @@
         alert("ID скопирован!");
     }
 
-    loadSavedData();
+    init();
 </script>
 </body>
 </html>
